@@ -42,6 +42,9 @@ const options = {
 
   apis: [
     "./src/api/auth/auth.router.js",
+    "./src/api/papers/paper.router.js",
+    "./src/api/contact/contact.router.js",
+    "./src/api/testimonials/testimonial.router.js",
   ],
 };
 
