@@ -15,6 +15,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
 
+// Using Routes
+app.use("/apis", require("./src/api/api.router"));
+
 // setting swagger
 
 const options = {
@@ -28,6 +31,9 @@ const options = {
       {
         url: "http://localhost:8001",
       },
+      {
+        url: "https://edunoble-backend.vercel.app"
+      }
     ],
     components: {
       securitySchemes: {
@@ -50,9 +56,21 @@ const options = {
 
 const specs = swaggerJsDoc(options);
 
-// Using Routes
-app.use("/apis", require("./src/api/api.router"));
-app.use("/apis/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
+// Swagger UI setup with proper configuration for production
+const swaggerUiOptions = {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "EduNoble API Documentation",
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    tryItOutEnabled: true,
+    docExpansion: "list",
+    filter: true,
+    showRequestHeaders: true,
+  },
+};
+
+app.use("/apis/api-docs", swaggerUI.serve, swaggerUI.setup(specs, swaggerUiOptions));
 
 //default route
 app.use("/", (req, res, next) => {
