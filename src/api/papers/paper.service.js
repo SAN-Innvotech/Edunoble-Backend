@@ -1,4 +1,8 @@
 const { SamplePaper } = require("../../models/samplePaper.model");
+const { Testimonial } = require("../../models/testimonial.model");
+const { Contact } = require("../../models/contact.model");
+const { User } = require("../../models/user.model");
+const { FAQ } = require("../../models/faq.model");
 
 const createPaper = async (payload) => {
   try {
@@ -135,6 +139,23 @@ const getPaperById = async (id) => {
   } catch (err) {
     console.log("getPaperById service error", err);
     return { status: 500, message: "Failed to fetch paper" };
+  }
+};
+
+const incrementViewCount = async (id) => {
+  try {
+    const paper = await SamplePaper.findByIdAndUpdate(
+      id,
+      { $inc: { viewCount: 1 } },
+      { new: true }
+    );
+    if (!paper || !paper.isActive) {
+      return { status: 404, message: "Paper not found" };
+    }
+    return { status: 200, data: { viewCount: paper.viewCount } };
+  } catch (err) {
+    console.log("incrementViewCount service error", err);
+    return { status: 500, message: "Failed to increment view count" };
   }
 };
 
@@ -420,6 +441,215 @@ const getSubjectsByClass = async () => {
   }
 };
 
+const getDashboardAnalytics = async () => {
+  try {
+    // Get total views (sum of all viewCounts)
+    const totalViewsResult = await SamplePaper.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalViews: { $sum: "$viewCount" }
+        }
+      }
+    ]);
+    const totalViews = totalViewsResult[0]?.totalViews || 0;
+
+    // Get top 5 papers by viewCount
+    const topPapers = await SamplePaper.find({})
+      .select("title class subject viewCount isActive featured createdAt")
+      .sort({ viewCount: -1 })
+      .limit(5)
+      .lean();
+
+    // Get paper statistics
+    const paperStats = await SamplePaper.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalPapers: { $sum: 1 },
+          activePapers: {
+            $sum: { $cond: ["$isActive", 1, 0] }
+          },
+          inactivePapers: {
+            $sum: { $cond: ["$isActive", 0, 1] }
+          },
+          featuredPapers: {
+            $sum: { $cond: ["$featured", 1, 0] }
+          }
+        }
+      }
+    ]);
+
+    // Get testimonial statistics
+    const testimonialStats = await Testimonial.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalTestimonials: { $sum: 1 },
+          activeTestimonials: {
+            $sum: { $cond: ["$isActive", 1, 0] }
+          },
+          inactiveTestimonials: {
+            $sum: { $cond: ["$isActive", 0, 1] }
+          }
+        }
+      }
+    ]);
+
+    // Get contact statistics
+    const contactStats = await Contact.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalContacts: { $sum: 1 },
+          resolvedContacts: {
+            $sum: { $cond: ["$isResolved", 1, 0] }
+          },
+          unresolvedContacts: {
+            $sum: { $cond: ["$isResolved", 0, 1] }
+          }
+        }
+      }
+    ]);
+
+    // Get user statistics
+    const userStats = await User.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalUsers: { $sum: 1 },
+          activeUsers: {
+            $sum: { $cond: ["$isActive", 1, 0] }
+          },
+          inactiveUsers: {
+            $sum: { $cond: ["$isActive", 0, 1] }
+          }
+        }
+      }
+    ]);
+
+    // Get FAQ statistics
+    const faqStats = await FAQ.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalFAQs: { $sum: 1 },
+          activeFAQs: {
+            $sum: { $cond: ["$isActive", 1, 0] }
+          },
+          inactiveFAQs: {
+            $sum: { $cond: ["$isActive", 0, 1] }
+          }
+        }
+      }
+    ]);
+
+    // Get recent papers (last week)
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    
+    const recentPapers = await SamplePaper.find({
+      createdAt: { $gte: oneWeekAgo }
+    })
+      .select("title class subject createdAt isActive")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Get papers by class distribution
+    const papersByClass = await SamplePaper.aggregate([
+      {
+        $group: {
+          _id: "$class",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { _id: 1 }
+      }
+    ]);
+
+    // Get papers by subject distribution (top 5)
+    const papersBySubject = await SamplePaper.aggregate([
+      {
+        $group: {
+          _id: "$subject",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { count: -1 }
+      },
+      {
+        $limit: 5
+      }
+    ]);
+
+    return {
+      status: 200,
+      data: {
+        totalViews,
+        topPapers: topPapers.map(paper => ({
+          id: paper._id,
+          title: paper.title,
+          class: paper.class,
+          subject: paper.subject,
+          viewCount: paper.viewCount,
+          isActive: paper.isActive,
+          featured: paper.featured,
+          createdAt: paper.createdAt,
+        })),
+        papers: {
+          total: paperStats[0]?.totalPapers || 0,
+          active: paperStats[0]?.activePapers || 0,
+          inactive: paperStats[0]?.inactivePapers || 0,
+          featured: paperStats[0]?.featuredPapers || 0,
+        },
+        testimonials: {
+          total: testimonialStats[0]?.totalTestimonials || 0,
+          active: testimonialStats[0]?.activeTestimonials || 0,
+          inactive: testimonialStats[0]?.inactiveTestimonials || 0,
+        },
+        contacts: {
+          total: contactStats[0]?.totalContacts || 0,
+          resolved: contactStats[0]?.resolvedContacts || 0,
+          unresolved: contactStats[0]?.unresolvedContacts || 0,
+        },
+        users: {
+          total: userStats[0]?.totalUsers || 0,
+          active: userStats[0]?.activeUsers || 0,
+          inactive: userStats[0]?.inactiveUsers || 0,
+        },
+        faqs: {
+          total: faqStats[0]?.totalFAQs || 0,
+          active: faqStats[0]?.activeFAQs || 0,
+          inactive: faqStats[0]?.inactiveFAQs || 0,
+        },
+        recentPapers: recentPapers.map(paper => ({
+          id: paper._id,
+          title: paper.title,
+          class: paper.class,
+          subject: paper.subject,
+          isActive: paper.isActive,
+          createdAt: paper.createdAt,
+        })),
+        distribution: {
+          byClass: papersByClass.map(item => ({
+            class: item._id,
+            count: item.count,
+          })),
+          bySubject: papersBySubject.map(item => ({
+            subject: item._id,
+            count: item.count,
+          })),
+        },
+      },
+    };
+  } catch (err) {
+    console.log("getDashboardAnalytics service error", err);
+    return { status: 500, message: "Failed to fetch dashboard analytics" };
+  }
+};
+
 module.exports = {
   createPaper,
   getPapers,
@@ -430,6 +660,8 @@ module.exports = {
   deletePaper,
   getMetadata,
   getSubjectsByClass,
+  incrementViewCount,
+  getDashboardAnalytics,
 };
 
 

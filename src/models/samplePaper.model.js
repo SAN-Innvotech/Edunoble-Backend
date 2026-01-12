@@ -13,6 +13,7 @@ const SamplePaperSchema = new Schema(
     fileUrl: { type: String, required: true }, // direct URL to the file
     driveFileId: { type: String }, // optional: internal Drive file id (if uploaded to Drive)
     featured: { type: Boolean, default: false },
+    viewCount: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
     createdBy: { type: Schema.Types.ObjectId, ref: "User" },
   },

@@ -237,6 +237,44 @@ router.get("/", paperController.getPapers);
 
 /**
  * @swagger
+ * /apis/papers/{id}/view:
+ *  patch:
+ *      summary: Increment view count for a paper (public)
+ *      tags: [papers]
+ *      parameters:
+ *        - in: path
+ *          name: id
+ *          required: true
+ *          schema:
+ *            type: string
+ *          description: Paper ID
+ *      responses:
+ *          200:
+ *              description: View count incremented successfully
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              isSuccess:
+ *                                  type: boolean
+ *                              message:
+ *                                  type: string
+ *                              code:
+ *                                  type: integer
+ *                              data:
+ *                                  type: object
+ *                                  properties:
+ *                                      viewCount:
+ *                                          type: integer
+ *                                          description: Updated view count
+ *          404:
+ *              description: Paper not found
+ */
+router.patch("/:id/view", paperController.incrementViewCount);
+
+/**
+ * @swagger
  * /apis/papers/{id}:
  *  get:
  *      summary: Get paper by id (public)
@@ -252,6 +290,72 @@ router.get("/", paperController.getPapers);
  *              description: response
  */
 router.get("/:id", paperController.getPaperById);
+
+/**
+ * @swagger
+ * /apis/papers/admin/dashboard:
+ *  get:
+ *      summary: Get dashboard analytics (admin)
+ *      tags: [papers]
+ *      security:
+ *        - bearerAuth: []
+ *      description: Returns comprehensive dashboard analytics including total views, top papers, and statistics across all models
+ *      responses:
+ *          200:
+ *              description: Dashboard analytics data
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              isSuccess:
+ *                                  type: boolean
+ *                              message:
+ *                                  type: string
+ *                              code:
+ *                                  type: integer
+ *                              data:
+ *                                  type: object
+ *                                  properties:
+ *                                      totalViews:
+ *                                          type: integer
+ *                                          description: Total views across all papers
+ *                                      topPapers:
+ *                                          type: array
+ *                                          description: Top 5 papers by view count
+ *                                          items:
+ *                                              type: object
+ *                                      papers:
+ *                                          type: object
+ *                                          properties:
+ *                                              total:
+ *                                                  type: integer
+ *                                              active:
+ *                                                  type: integer
+ *                                              inactive:
+ *                                                  type: integer
+ *                                              featured:
+ *                                                  type: integer
+ *                                      testimonials:
+ *                                          type: object
+ *                                      contacts:
+ *                                          type: object
+ *                                      users:
+ *                                          type: object
+ *                                      faqs:
+ *                                          type: object
+ *                                      recentPapers:
+ *                                          type: array
+ *                                          description: Last 5 created papers
+ *                                      distribution:
+ *                                          type: object
+ *                                          properties:
+ *                                              byClass:
+ *                                                  type: array
+ *                                              bySubject:
+ *                                                  type: array
+ */
+router.get("/admin/dashboard", authMiddleware, paperController.getDashboardAnalytics);
 
 /**
  * @swagger
