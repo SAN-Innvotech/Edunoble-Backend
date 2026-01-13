@@ -160,6 +160,32 @@ const getSubjectsByClass = async (req, res) => {
   }
 };
 
+const incrementViewCount = async (req, res) => {
+  try {
+    const result = await paperService.incrementViewCount(req.params.id);
+    if (!result.status || result.status !== 200) {
+      return responses.generateResponse(res, false, result.message, result.status);
+    }
+    return responses.successResponse(res, result.data);
+  } catch (err) {
+    console.log("incrementViewCount controller error", err);
+    return responses.internalFailureResponse(res, err);
+  }
+};
+
+const getDashboardAnalytics = async (req, res) => {
+  try {
+    const result = await paperService.getDashboardAnalytics();
+    if (!result.status || result.status !== 200) {
+      return responses.generateResponse(res, false, result.message, result.status);
+    }
+    return responses.successResponse(res, result.data);
+  } catch (err) {
+    console.log("getDashboardAnalytics controller error", err);
+    return responses.internalFailureResponse(res, err);
+  }
+};
+
 module.exports = {
   createPaper,
   getPapers,
@@ -170,6 +196,8 @@ module.exports = {
   deletePaper,
   getMetadata,
   getSubjectsByClass,
+  incrementViewCount,
+  getDashboardAnalytics,
 };
 
 
