@@ -6,6 +6,8 @@ const UserSchema = new Schema(
     email: { type: String, unique: true },
     phone: { type: String, unique: true },
     password: { type: String, required: true },
+    otp: { type: String },
+    otpSentAt: { type: Date },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
