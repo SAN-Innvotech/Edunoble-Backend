@@ -51,6 +51,7 @@ const options = {
     "./src/api/papers/paper.router.js",
     "./src/api/contact/contact.router.js",
     "./src/api/testimonials/testimonial.router.js",
+    "./src/api/contentPages/contentPage.router.js",
   ],
 };
 
