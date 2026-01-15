@@ -52,11 +52,47 @@ const markAsResolved = async (id, notes) => {
   }
 };
 
+const listAllFAQs = async () => {
+  try {
+    const faqs = await FAQ.find({}).sort({ order: 1, createdAt: 1 });
+    return { status: 200, data: faqs };
+  } catch (err) {
+    console.log("listAllFAQs service error", err);
+    return { status: 500, message: "Failed to fetch FAQs" };
+  }
+};
+
+const createFAQ = async (payload) => {
+  try {
+    const faq = await FAQ.create(payload);
+    return { status: 200, data: faq };
+  } catch (err) {
+    console.log("createFAQ service error", err);
+    return { status: 500, message: "Failed to create FAQ" };
+  }
+};
+
+const updateFAQ = async (id, body) => {
+  try {
+    const faq = await FAQ.findByIdAndUpdate(id, body, { new: true });
+    if (!faq) {
+      return { status: 404, message: "FAQ not found" };
+    }
+    return { status: 200, data: faq };
+  } catch (err) {
+    console.log("updateFAQ service error", err);
+    return { status: 500, message: "Failed to update FAQ" };
+  }
+};
+
 module.exports = {
   createContact,
   listContacts,
   getFAQs,
   markAsResolved,
+  listAllFAQs,
+  createFAQ,
+  updateFAQ,
 };
 
 
