@@ -87,6 +87,8 @@ router.get("/", homepageController.getHomepage);
  *                                      type: string
  *                                  description:
  *                                      type: string
+ *                                  logo:
+ *                                      type: string
  *                                  pictureUrl1:
  *                                      type: string
  *                                  pictureUrl2:
@@ -260,6 +262,7 @@ router.post("/admin", authMiddleware, homepageController.createHomepage);
  *                          headline: "Practice Sample Papers"
  *                          subheading: "for Class 8, 9, 10, 11 & 12"
  *                          description: "Access high-quality sample papers..."
+ *                          logo: "https://example.com/logo.png"
  *      responses:
  *          200:
  *              description: Section updated successfully
@@ -300,6 +303,8 @@ router.patch("/admin/:id/section/:section", authMiddleware, homepageController.u
  *                                  subheading:
  *                                      type: string
  *                                  description:
+ *                                      type: string
+ *                                  logo:
  *                                      type: string
  *                                  pictureUrl1:
  *                                      type: string

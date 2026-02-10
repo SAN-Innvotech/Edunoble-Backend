@@ -7,6 +7,7 @@ const HomepageSchema = new Schema(
       headline: { type: String, required: true }, // "Practice Sample Papers"
       subheading: { type: String }, // "for Class 8, 9, 10, 11 & 12"
       description: { type: String, required: true },
+      logo: { type: String }, // optional
       pictureUrl1: { type: String }, // optional
       pictureUrl2: { type: String }, // optional
       pictureUrl3: { type: String }, // optional
