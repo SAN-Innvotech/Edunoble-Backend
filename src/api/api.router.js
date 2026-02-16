@@ -1,4 +1,3 @@
-
 const router = require("express").Router({ mergeParams: true });
 
 router.use("/auth", require("./auth/auth.router"));
@@ -8,5 +7,6 @@ router.use("/testimonials", require("./testimonials/testimonial.router"));
 router.use("/content-pages", require("./contentPages/contentPage.router"));
 router.use("/homepage", require("./homepage/homepage.router"));
 router.use("/upload", require("./upload/upload.router"));
+router.use("/leads", require("./leads/lead.router"));
 
 module.exports = router;
