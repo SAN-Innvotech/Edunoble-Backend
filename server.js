@@ -32,7 +32,7 @@ const options = {
         url: "http://localhost:8001",
       },
       {
-        url: "https://edunoble-backend.vercel.app"
+        url: "https://backbone.edunoble.in"
       }
     ],
     components: {
