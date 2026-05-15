@@ -54,7 +54,10 @@ const options = {
     "./src/api/contentPages/contentPage.router.js",
     "./src/api/upload/upload.router.js",
     "./src/api/homepage/homepage.router.js",
-    "./src/api/leads/lead.router.js"
+    "./src/api/leads/lead.router.js",
+    "./src/api/blogs/blog.router.js",
+    "./src/api/courses/course.router.js",
+    "./src/api/toppers/topper.router.js"
   ],
 };
 
