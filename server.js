@@ -4,7 +4,6 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const swaggerUI = require("swagger-ui-express");
 const swaggerJsDoc = require("swagger-jsdoc");
-const { seedContent } = require("./src/utility/seedContent");
 
 // loading process variables declared in .env file
 require("dotenv").config();
@@ -101,17 +100,8 @@ mongoose.connect(process.env.MONGO_URL, {
 
 var db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
-db.once("open", async function callback() {
+db.once("open", function callback() {
   console.log("MongoDB connected!!!");
-
-  // Auto-seed sample content (idempotent — runs once when collections are empty).
-  // Wrapped in try/catch so a seed failure never crashes the server.
-  try {
-    await seedContent();
-  } catch (err) {
-    console.log("seedContent failed", err);
-  }
-
   httpServer.listen(port, () => {
     console.log("serving!!!");
   });
