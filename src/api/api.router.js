@@ -8,5 +8,8 @@ router.use("/content-pages", require("./contentPages/contentPage.router"));
 router.use("/homepage", require("./homepage/homepage.router"));
 router.use("/upload", require("./upload/upload.router"));
 router.use("/leads", require("./leads/lead.router"));
+router.use("/blogs", require("./blogs/blog.router"));
+router.use("/courses", require("./courses/course.router"));
+router.use("/toppers", require("./toppers/topper.router"));
 
 module.exports = router;
