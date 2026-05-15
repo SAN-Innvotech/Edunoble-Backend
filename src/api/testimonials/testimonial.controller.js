@@ -3,7 +3,7 @@ const testimonialService = require("./testimonial.service");
 
 const createTestimonial = async (req, res) => {
   try {
-    const { heading, quote, authorName, authorClass, authorDetails, order, isActive } = req.body;
+    const { heading, quote, authorName, authorClass, authorDetails, photoUrl, rating, order, isActive } = req.body;
 
     if (!heading || !quote || !authorName || !authorClass) {
       return responses.badRequestResponse(res, "heading, quote, authorName, and authorClass are required");
@@ -15,6 +15,8 @@ const createTestimonial = async (req, res) => {
       authorName,
       authorClass,
       authorDetails,
+      photoUrl: photoUrl !== undefined ? photoUrl : "",
+      rating: rating !== undefined && rating !== null && rating !== "" ? Number(rating) : null,
       order: order ? Number(order) : 0,
       isActive: isActive !== undefined ? isActive : true,
     };
